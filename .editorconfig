@@ -1,0 +1,216 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+
+# Dotnet & C# code style settings
+# See https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
+[{*.cs,*.csx}]
+indent_size=4
+
+# Indentation
+csharp_indent_block_contents = true:suggestion
+csharp_indent_braces = false:suggestion
+csharp_indent_case_contents = true:suggestion
+csharp_indent_switch_labels = true:suggestion
+csharp_indent_labels = flush_left:suggestion
+
+# Line Breaks
+csharp_insert_final_newline = true
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_before_while = true
+csharp_new_line_within_query_expression_clauses = true
+max_line_length = 120
+
+# Spacing
+csharp_space_after_cast = false
+csharp_space_after_colon_in_inheritance_clause = true
+csharp_space_after_comma = true
+csharp_space_after_dot = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_semicolon_in_for_statement = true
+csharp_space_around_binary_operators = before_and_after
+csharp_space_around_declaration_statements = do_not_ignore
+csharp_space_before_colon_in_inheritance_clause = true
+csharp_space_before_comma = false
+csharp_space_before_dot = false
+csharp_space_before_open_square_brackets = false
+csharp_space_before_semicolon_in_for_statement = false
+csharp_space_between_empty_square_brackets = false
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_declaration_name_and_open_parenthesis = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_parentheses = false
+csharp_space_between_square_brackets = false
+
+# Code Blocks
+csharp_prefer_braces = true:none
+
+# Prefer "var" everywhere
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+
+# Prefer method-like constructs to have a block body
+csharp_style_expression_bodied_methods = false:none
+csharp_style_expression_bodied_constructors = false:none
+csharp_style_expression_bodied_operators = false:none
+
+# Prefer property-like constructs to have an expression-body
+csharp_style_expression_bodied_properties = true:none
+csharp_style_expression_bodied_indexers = true:none
+csharp_style_expression_bodied_accessors = true:none
+
+# Using directives and reference qualification
+dotnet_sort_system_directives_first = true
+
+# Always use "this." and "Me." when applicable
+dotnet_style_qualification_for_field = true
+dotnet_style_qualification_for_property = true
+dotnet_style_qualification_for_method = true
+dotnet_style_qualification_for_event = true
+
+# Use language keywords where applicable
+dotnet_style_predefined_type_for_locals_parameters_members = true
+dotnet_style_predefined_type_for_member_access = true
+
+# Suggest more modern language features when available
+dotnet_style_coalesce_expression = true
+dotnet_style_collection_initializer = true
+csharp_style_conditional_delegate_call = true
+dotnet_style_explicit_tuple_names = true
+csharp_style_inlined_variable_declaration = true
+dotnet_style_null_propagation = true
+dotnet_style_object_initializer = true
+csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_throw_expression = true
+
+
+###################################################################################################
+## Naming                                                                                        ##
+## See https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions         ##
+###################################################################################################
+
+# Style Definitions
+dotnet_naming_style.pascal_case_style.capitalization               = pascal_case
+dotnet_naming_style.camel_case_style.capitalization                = camel_case
+dotnet_naming_style.I_prefix_style.required_prefix                 = I
+dotnet_naming_style.I_prefix_style.capitalization                  = pascal_case
+
+# Use PascalCase for constant fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity  = warning
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols   = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style     = pascal_case_style
+dotnet_naming_symbols.constant_fields.applicable_kinds             = field
+dotnet_naming_symbols.constant_fields.applicable_accessibilities   = *
+dotnet_naming_symbols.constant_fields.required_modifiers           = const
+
+# Use PascalCase for public fields
+dotnet_naming_rule.pascal_case_for_public_fields.severity          = warning
+dotnet_naming_rule.pascal_case_for_public_fields.symbols           = public_fields
+dotnet_naming_rule.pascal_case_for_public_fields.style             = pascal_case_style
+dotnet_naming_symbols.public_fields.applicable_kinds               = field
+dotnet_naming_symbols.public_fields.applicable_accessibilities     = public
+
+# Interfaces must be PascalCase and have an I prefix
+dotnet_naming_rule.interfaces_start_with_I.severity                = warning
+dotnet_naming_rule.interfaces_start_with_I.symbols                 = any_interface
+dotnet_naming_rule.interfaces_start_with_I.style                   = I_prefix_style
+dotnet_naming_symbols.any_interface.applicable_accessibilities     = *
+dotnet_naming_symbols.any_interface.applicable_kinds               = interface
+
+# Classes, structs, methods, enums, events, properties, namespaces, delegates must be PascalCase
+dotnet_naming_rule.general_naming.severity                         = warning
+dotnet_naming_rule.general_naming.symbols                          = general
+dotnet_naming_rule.general_naming.style                            = pascal_case_style
+dotnet_naming_symbols.general.applicable_kinds                     = class,struct,enum,property,method,event,namespace,delegate
+dotnet_naming_symbols.general.applicable_accessibilities           = *
+
+# Everything else is camelCase
+dotnet_naming_rule.everything_else_naming.severity                 = warning
+dotnet_naming_rule.everything_else_naming.symbols                  = everything_else
+dotnet_naming_rule.everything_else_naming.style                    = camel_case_style
+dotnet_naming_symbols.everything_else.applicable_kinds             = *
+dotnet_naming_symbols.everything_else.applicable_accessibilities   = *
+
+###################################################################################################
+## JetBrains ReSharper/Rider                                                                     ##
+## See https://www.jetbrains.com/help/rider/EditorConfig_Properties.html                         ##
+###################################################################################################
+
+# Using directives and reference qualification
+csharp_add_imports_to_deepest_scope = true
+csharp_allow_alias = true
+csharp_can_use_global_alias = true
+csharp_prefer_qualified_reference = false
+csharp_qualified_using_at_nested_scope = true
+
+# Blank Lines
+csharp_blank_lines_after_block_statements = 1
+csharp_blank_lines_after_control_transfer_statements = 1
+csharp_blank_lines_after_multiline_statements = 0
+csharp_blank_lines_after_using_list = 1
+csharp_blank_lines_before_control_transfer_statements = 1
+csharp_blank_lines_before_multiline_statements = 0
+csharp_blank_lines_before_single_line_comment = 1
+csharp_blank_lines_between_using_groups = 1
+csharp_blank_lines_around_auto_property = 1
+csharp_blank_lines_around_field = 1
+csharp_blank_lines_around_invocable = 1
+csharp_blank_lines_around_local_method = 1
+csharp_blank_lines_around_property = 1
+csharp_blank_lines_around_single_line_field = 1
+csharp_blank_lines_around_single_line_invocable = 1
+csharp_blank_lines_around_single_line_local_method = 1
+csharp_blank_lines_around_single_line_property = 1
+csharp_blank_lines_around_single_line_auto_property = 1
+csharp_blank_lines_before_block_statements = 1
+csharp_blank_lines_before_control_transfer_statements = 1
+csharp_keep_blank_lines_in_code = 1
+csharp_remove_blank_lines_near_braces_in_code = true
+
+# Line Breaks
+csharp_brace_style = next_line                     # Generalized setting. BSD style.
+csharp_keep_existing_linebreaks = true
+csharp_keep_existing_declaration_parens_arrangement = false
+csharp_place_constructor_initializer_on_same_line = false
+csharp_wrap_after_declaration_lpar = true
+csharp_wrap_after_dot_in_method_calls = false
+csharp_wrap_after_invocation_lpar = true
+csharp_wrap_arguments_style = chop_if_long
+csharp_wrap_before_comma = false
+csharp_wrap_chained_method_calls = chop_if_long
+csharp_wrap_parameters_style  = chop_if_long
+
+# Spaces
+csharp_extra_spaces = remove_all
+csharp_space_within_single_line_array_initializer_braces = true
+
+# Parentheses
+csharp_parentheses_redundancy_style = remove_if_not_clarifies_precedence
+csharp_parentheses_non_obvious_operations = arithmetic,bitwise,conditional,shift
+
+# Inspections
+# See https://www.jetbrains.com/help/rider/Reference__Code_Inspections_CSHARP.html
+resharper_c_sharp_warnings_cs1591_highlighting = do_not_show
+resharper_redundant_comma_in_initializer_highlighting = do_not_show
+resharper_redundant_comma_in_enum_declaration_highlighting = do_not_show
+resharper_separate_control_transfer_statement_highlighting = warning
+resharper_suggest_base_type_for_parameter_highlighting = do_no_show
+resharper_switch_statement_missing_some_cases_highlighting = do_not_show
+resharper_tabs_are_disallowed_highlighting = warning
+resharper_unnecessary_whitespace_highlighting = warning

@@ -1,0 +1,15 @@
+# IDEs
+.vs/
+.vscode/
+.idea/
+
+# User specific files
+*.user
+
+# Build Results
+[Aa]rtifacts/
+[Tt]est-[Rr]esults/
+[Dd]ebug/
+[Rr]elease/
+[Bb]in
+[Oo]bj/
