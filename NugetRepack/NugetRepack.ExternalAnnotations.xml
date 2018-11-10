@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<assembly name="NugetRepack">
+  <member name="M:NugetRepack.IZipper.Unzip(System.String,System.String,System.Threading.CancellationToken)">
+    <parameter name="zipFile">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="targetDirectory">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:NugetRepack.IZipper.Zip(System.String,System.String,System.Threading.CancellationToken)">
+    <parameter name="rootDirectory">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+    <parameter name="zipFile">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+  <member name="M:NugetRepack.Zipper.#ctor(NugetRepack.IFileSystem)">
+    <parameter name="fileSystem">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor" />
+    </parameter>
+  </member>
+</assembly>
