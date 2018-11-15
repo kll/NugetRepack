@@ -1,0 +1,6 @@
+mode: Mainline
+branches:
+  master:
+    tag: rc
+ignore:
+  sha: []

@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+
+# sane settings for the script interpreter
+set -o errexit  # exit when a command fails
+set -o pipefail # pipes have exit status of the last command that had a non-zero exit code
+set -o nounset  # exit on attempts to use undeclared variables
+[[ "${TRACE:-}" == 'true' ]] && set -o xtrace   # prints every expression before executing it when debugging
+
+# ensure we clean up after ourselves
+trap 'echo "Cleaning up"; rm -f nuget.config; exit $?' INT TERM EXIT
+
+# configuration
+readonly dotnet_sdk_version='2.1'
+readonly gitversion_version='4.0.1-PullRequest1422.50'
+readonly nugetrepack_version='0.1.1-repack.3'
+readonly main_project='NugetRepack.Tool'
+
+# Set magic variables for current file & dir
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+__file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
+
+main() {
+  local target="${1:-pack}"
+  local configuration="${2:-Release}"
+  local artifacts_dir="${__dir}/artifacts"
+  local tools_dir="${__dir}/.tools"
+  local gitversion_install="${tools_dir}/gitversion"
+  local gitversion_path="${gitversion_install}/dotnet-gitversion"
+  local nugetrepack_install="${tools_dir}/nugetrepack"
+  local nugetrepack_path="${nugetrepack_install}/nugetrepack"
+  local semantic_version
+  local informational_version
+
+  echo "Running target '${target}' with configuration '${configuration}'."
+
+  verify_prerequisites
+  get_version
+
+  if [[ "${target}" = 'pack' ]]; then
+    clean
+    build
+    unittest
+    pack
+  elif [[ "${target}" = 'repack' ]]; then
+    repack
+  elif [[ "${target}" = 'push' ]]; then
+    push
+  else
+    echo "Unknown target: ${target}"
+    exit 1
+  fi
+}
+
+verify_prerequisites() {
+  verify_dotnet
+  verify_gitversion
+  verify_nugetrepack
+}
+
+verify_dotnet() {
+  # Ensure dotnet is available.
+  if ! [ -x "$(command -v dotnet)" ]; then
+    echo 'Error: dotnet is not installed.' >&2
+    exit 1
+  fi
+
+  # Check the version
+  local found_dotnet_sdk_version="$(dotnet --version)"
+  if echo "${found_dotnet_sdk_version}" | grep --regex="^${dotnet_sdk_version}" --quiet; then
+    echo "Using .NET core SDK version: ${found_dotnet_sdk_version}"
+  else
+    echo "Incorrect version of .NET core SDK detected! Found version: ${found_dotnet_sdk_version}, expected version compatible with: ${dotnet_sdk_version}"
+    exit 1
+  fi
+}
+
+verify_gitversion() {
+  local recurse="${1:-true}"
+
+  # Ensure gitversion is available.
+  if ! [ -x "$(command -v ${gitversion_path})" ]; then
+    install_gitversion
+  fi
+
+  local found_gitversion_version="$(MSYS_NO_PATHCONV=1 ${gitversion_path} /version)"
+  if echo "${found_gitversion_version}" | grep --regex="^${found_gitversion_version}" --quiet; then
+    echo "Using GitVersion version: ${found_gitversion_version}"
+  else
+    if [[ "${recurse}" = 'true' ]]; then
+      verify_gitversion false
+    else
+      echo "Failed to install correct version of GitVersion."
+      exit 1
+    fi
+  fi
+}
+
+install_gitversion() {
+  if [[ -d "${gitversion_install}" ]]; then
+    echo 'Deleting old GitVersion installation.'
+    rm --recursive --force "${gitversion_install}"
+  fi
+
+  echo 'Installing GitVersion.'
+  # TODO: Remove the --add-source once it is published on the normal nuget feed.
+  dotnet tool install GitVersion.Tool --version "${gitversion_version}" --tool-path "${gitversion_install}" --add-source https://ci.appveyor.com/nuget/gitversion-8nigugxjftrw
+}
+
+verify_nugetrepack() {
+  local recurse="${1:-true}"
+
+  # Ensure nugetrepack is available.
+  if ! [ -x "$(command -v ${nugetrepack_path})" ]; then
+    install_nugetrepack
+  fi
+
+  local found_nugetrepack_version="$(${nugetrepack_path} version)"
+  if echo "${found_nugetrepack_version}" | grep --regex="^${nugetrepack_version}" --quiet; then
+    echo "Using NugetRepack version: ${found_nugetrepack_version}"
+  else
+    if [[ "${recurse}" = 'true' ]]; then
+      verify_nugetrepack false
+    else
+      echo "Failed to install correct version of NugetRepack."
+      exit 1
+    fi
+  fi
+}
+
+install_nugetrepack() {
+  if [[ -d "${nugetrepack_install}" ]]; then
+    echo 'Deleting old NugetRepack installation.'
+    rm --recursive --force "${nugetrepack_install}"
+  fi
+
+  echo 'Installing NugetRepack.'
+  dotnet tool install NugetRepack.Tool --version "${nugetrepack_version}" --tool-path "${nugetrepack_install}"
+}
+
+get_version() {
+  local version_json="$(${gitversion_path})"
+  semantic_version="$(echo "${version_json}" | grep --regex='"SemVer"' | cut --delimiter='"' --fields=4)"
+  informational_version="$(echo "${version_json}" | grep --regex='"InformationalVersion"' | cut --delimiter='"' --fields=4)"
+  echo "Using semantic version: ${semantic_version}"
+  echo "Using informational version: ${informational_version}"
+}
+
+clean() {
+  if [[ -d "${artifacts_dir}" ]]; then
+    echo 'Cleaning artifacts directory.'
+    rm --recursive --force "${artifacts_dir}"
+  fi
+
+  dotnet clean --configuration "${configuration}"
+}
+
+build() {
+  dotnet build --configuration "${configuration}" /property:Version=\""${semantic_version}"\" /property:InformationalVersion=\""${informational_version}"\"
+}
+
+unittest() {
+  for project in $(ls --recursive --directory *UnitTests); do
+    dotnet test --configuration "${configuration}" --no-build --no-restore "${project}"
+  done
+}
+
+pack() {
+  dotnet pack --configuration "${configuration}" /property:Version=\""${semantic_version}"\" --no-build --no-restore --output "${artifacts_dir}" "${main_project}"
+}
+
+repack() {
+  for package in $(ls ${artifacts_dir}/*.nupkg); do
+    $nugetrepack_path repack "${package}"
+  done
+}
+
+push() {
+  if [ -z "${PACKAGE_APIKEY:-}" ]; then
+    echo "PACKAGE_APIKEY environment variable is not set!"
+    exit 1
+  fi
+
+  for package in $(ls ${artifacts_dir}/*.nupkg); do
+    if [ -z "${PACKAGE_SOURCE:-}" ]; then
+      dotnet nuget push "${package}" --api-key "${PACKAGE_APIKEY}"
+    else
+      dotnet nuget push "${package}" --api-key "${PACKAGE_APIKEY}" --source "${PACKAGE_SOURCE}"
+    fi
+  done
+}
+
+main "$@"
