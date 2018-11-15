@@ -89,6 +89,7 @@ verify_gitversion() {
     echo "Using GitVersion version: ${found_gitversion_version}"
   else
     if [[ "${recurse}" = 'true' ]]; then
+      install_gitversion
       verify_gitversion false
     else
       echo "Failed to install correct version of GitVersion."
@@ -121,6 +122,7 @@ verify_nugetrepack() {
     echo "Using NugetRepack version: ${found_nugetrepack_version}"
   else
     if [[ "${recurse}" = 'true' ]]; then
+      install_nugetrepack
       verify_nugetrepack false
     else
       echo "Failed to install correct version of NugetRepack."
