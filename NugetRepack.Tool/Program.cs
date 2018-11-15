@@ -1,4 +1,4 @@
-namespace NugetRepack
+namespace NugetRepack.Tool
 {
     using System;
     using System.Threading.Tasks;

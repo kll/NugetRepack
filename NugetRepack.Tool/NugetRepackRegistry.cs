@@ -1,4 +1,4 @@
-namespace NugetRepack
+namespace NugetRepack.Tool
 {
     using Lamar;
 
@@ -12,6 +12,7 @@ namespace NugetRepack
                 scan =>
                 {
                     scan.TheCallingAssembly();
+                    scan.AssembliesAndExecutablesFromApplicationBaseDirectory();
                     scan.WithDefaultConventions();
                 });
             this.For<LoggingLevelSwitch>().Use(levelSwitch);

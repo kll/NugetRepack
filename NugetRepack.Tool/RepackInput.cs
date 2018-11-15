@@ -1,4 +1,4 @@
-namespace NugetRepack
+namespace NugetRepack.Tool
 {
     using Oakton;
 
