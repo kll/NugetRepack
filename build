@@ -12,7 +12,7 @@ trap 'echo "Cleaning up"; rm -f nuget.config; exit $?' INT TERM EXIT
 # configuration
 readonly dotnet_sdk_version='2.1'
 readonly gitversion_version='4.0.1-PullRequest1422.50'
-readonly nugetrepack_version='0.1.1-repack.3'
+readonly nugetrepack_version='0.1.1-rc.7'
 readonly main_project='NugetRepack.Tool'
 
 # Set magic variables for current file & dir
@@ -22,6 +22,8 @@ __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 main() {
   local target="${1:-pack}"
   local configuration="${2:-Release}"
+  local push_source="${3:-}"
+  local push_apikey="${4:-}"
   local artifacts_dir="${__dir}/artifacts"
   local tools_dir="${__dir}/.tools"
   local gitversion_install="${tools_dir}/gitversion"
@@ -175,17 +177,28 @@ repack() {
 }
 
 push() {
-  if [ -z "${PACKAGE_APIKEY:-}" ]; then
-    echo "PACKAGE_APIKEY environment variable is not set!"
-    exit 1
+  if [[ -z "${push_source}" ]]; then
+    push_source="${PUSH_SOURCE:-}"
+
+    if [[ -z "${push_source}" ]]; then
+      echo "No push source provided."
+      echo "It can be passed as the 3rd positional argument or set in the PUSH_SOURCE environment variable."
+      exit 1
+    fi
+  fi
+
+  if [[ -z "${push_apikey}" ]]; then
+    push_apikey="${PUSH_APIKEY:-}"
+
+    if [[ -z "${push_apikey}" ]]; then
+      echo "No push API key provided."
+      echo "It can be passed as the 4rth positional argument or set in the PUSH_APIKEY environment variable."
+      exit 1
+    fi
   fi
 
   for package in $(ls ${artifacts_dir}/*.nupkg); do
-    if [ -z "${PACKAGE_SOURCE:-}" ]; then
-      dotnet nuget push "${package}" --api-key "${PACKAGE_APIKEY}"
-    else
-      dotnet nuget push "${package}" --api-key "${PACKAGE_APIKEY}" --source "${PACKAGE_SOURCE}"
-    fi
+    dotnet nuget push "${package}" --source "${push_source}" --api-key "${push_apikey}"
   done
 }
 
