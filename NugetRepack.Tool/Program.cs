@@ -22,7 +22,7 @@ namespace NugetRepack.Tool
                 config =>
                 {
                     config.RegisterCommand<RepackCommand>();
-                    config.DefaultCommand = typeof(RepackCommand);
+                    config.RegisterCommand<VersionCommand>();
                 },
                 new LamarCommandCreator(container));
 

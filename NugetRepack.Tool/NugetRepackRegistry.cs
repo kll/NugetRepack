@@ -17,6 +17,7 @@ namespace NugetRepack.Tool
                 });
             this.For<LoggingLevelSwitch>().Use(levelSwitch);
             this.ForConcreteType<RepackCommand>();
+            this.ForConcreteType<VersionCommand>();
         }
     }
 }
