@@ -7,11 +7,11 @@ set -o nounset  # exit on attempts to use undeclared variables
 [[ "${TRACE:-}" == 'true' ]] && set -o xtrace   # prints every expression before executing it when debugging
 
 # ensure we clean up after ourselves
-trap 'echo "Cleaning up"; rm -f nuget.config; exit $?' INT TERM EXIT
+trap 'build_exitcode=$?; echo "Cleaning up"; rm -f nuget.config; exit $build_exitcode' INT TERM EXIT
 
 # configuration
 readonly dotnet_sdk_version='2.1'
-readonly gitversion_version='4.0.1-PullRequest1422.50'
+readonly gitversion_version='4.0.0-netstandard2-1-1696'
 readonly nugetrepack_version='0.1.1-rc.7'
 readonly main_project='NugetRepack.Tool'
 
@@ -85,7 +85,11 @@ verify_gitversion() {
   fi
 
   local found_gitversion_version="$(MSYS_NO_PATHCONV=1 ${gitversion_path} /version)"
-  if echo "${found_gitversion_version}" | grep --regex="^${found_gitversion_version}" --quiet; then
+
+  # TODO: Remove this override hack once it's published with a properly matching version.
+  local temp_gitversion_version_override='4.0.0-netstandard2.1+1696'
+
+  if echo "${found_gitversion_version}" | grep --regex="^${temp_gitversion_version_override}" --quiet; then
     echo "Using GitVersion version: ${found_gitversion_version}"
   else
     if [[ "${recurse}" = 'true' ]]; then
@@ -106,7 +110,7 @@ install_gitversion() {
 
   echo 'Installing GitVersion.'
   # TODO: Remove the --add-source once it is published on the normal nuget feed.
-  dotnet tool install GitVersion.Tool --version "${gitversion_version}" --tool-path "${gitversion_install}" --add-source https://ci.appveyor.com/nuget/gitversion-8nigugxjftrw
+  dotnet tool install GitVersion.Tool --version "${gitversion_version}" --tool-path "${gitversion_install}" --add-source https://ci.appveyor.com/nuget/gitversion-2vslk9xa2w22
 }
 
 verify_nugetrepack() {

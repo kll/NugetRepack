@@ -23,13 +23,13 @@ main() {
     exit 1
   fi
 
-  docker run --mount type=bind,source="${__dir}",target=/src  \
-            --workdir /src \
-            --rm \
-            -e PACKAGE_SOURCE \
-            -e PACKAGE_APIKEY \
-            -e TRACE \
-            "${build_image}" ./build "$@"
+  docker run  --mount type=bind,source="${__dir}",target=/src  \
+              --workdir /src \
+              --rm \
+              -e PUSH_SOURCE \
+              -e PUSH_APIKEY \
+              -e TRACE \
+              "${build_image}" ./build "$@"
 }
 
 main "$@"

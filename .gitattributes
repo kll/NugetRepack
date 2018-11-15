@@ -2,3 +2,9 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
+
+###############################################################################
+# Override the build scripts that require LF to execute properly.
+###############################################################################
+build text eol=lf
+build-docker text eol=lf
