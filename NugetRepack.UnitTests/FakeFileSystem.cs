@@ -4,6 +4,8 @@ namespace NugetRepack.UnitTests
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Moq;
 
@@ -67,7 +69,10 @@ namespace NugetRepack.UnitTests
                             this.Content[filePath] = new WillNotDisposeMemoryStream();
                         }
 
-                        return new FakeFileStream(filePath, this.Content[filePath]);
+                        var stream = this.Content[filePath];
+                        stream.Position = 0;
+
+                        return new FakeFileStream(filePath, stream);
                     });
 
             return mock.Object;
@@ -76,6 +81,30 @@ namespace NugetRepack.UnitTests
         public override string GetFullPath(string filePath)
         {
             return Path.GetFullPath(filePath, this.Root);
+        }
+
+        public override Task<string> ReadAllText(string filePath, CancellationToken cancellationToken = default)
+        {
+            var file = this.GetFile(filePath);
+
+            using (var reader = new StreamReaderAdapter(file.OpenRead()))
+            {
+                return reader.ReadToEndAsync();
+            }
+        }
+
+        public override async Task WriteAllText(string filePath, string contents, CancellationToken cancellationToken = default)
+        {
+            var memoryStream = new WillNotDisposeMemoryStream();
+
+            using (var writer = new StreamWriter(memoryStream))
+            {
+                await writer.WriteAsync(contents);
+            }
+
+            memoryStream.Position = 0;
+
+            this.Content[this.GetFullPath(filePath)] = memoryStream;
         }
 
         public void AddFile(string filePath, string contents)

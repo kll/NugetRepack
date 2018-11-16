@@ -1,5 +1,6 @@
 namespace NugetRepack
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Thinktecture.IO;
@@ -16,10 +17,10 @@ namespace NugetRepack
 
         string GetFullPath(string filePath);
 
-        Task<string> ReadAllText(string path);
+        Task<string> ReadAllText(string path, CancellationToken cancellationToken = default);
 
         Task<bool> ReplaceInFile(string path, string findText, string replaceText);
 
-        Task WriteAllText(string path, string content);
+        Task WriteAllText(string path, string contents, CancellationToken cancellationToken = default);
     }
 }

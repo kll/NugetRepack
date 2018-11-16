@@ -2,6 +2,7 @@ namespace NugetRepack
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Thinktecture.IO;
@@ -36,17 +37,11 @@ namespace NugetRepack
             return Path.GetFullPath(filePath);
         }
 
-        public virtual async Task<string> ReadAllText(string path)
+        public virtual async Task<string> ReadAllText(string path, CancellationToken cancellationToken = default)
         {
-            var file = this.GetFile(path);
+            var adapter = new FileAdapter();
 
-            using (var stream = file.OpenRead())
-            {
-                using (var reader = new StreamReaderAdapter(stream))
-                {
-                    return await reader.ReadToEndAsync();
-                }
-            }
+            return await adapter.ReadAllTextAsync(path, cancellationToken);
         }
 
         public virtual async Task<bool> ReplaceInFile(string path, string findText, string replaceText)
@@ -65,17 +60,13 @@ namespace NugetRepack
             return true;
         }
 
-        public virtual async Task WriteAllText(string path, string content)
+        public virtual async Task WriteAllText(
+            string path,
+            string contents,
+            CancellationToken cancellationToken = default)
         {
-            var file = this.GetFile(path);
-
-            using (var stream = file.OpenWrite())
-            {
-                using (var writer = new StreamWriterAdapter(stream))
-                {
-                    await writer.WriteAsync(content);
-                }
-            }
+            var adapter = new FileAdapter();
+            await adapter.WriteAllTextAsync(path, contents, cancellationToken);
         }
     }
 }

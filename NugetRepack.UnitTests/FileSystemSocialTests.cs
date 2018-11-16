@@ -78,13 +78,13 @@ namespace NugetRepack.UnitTests
         [Fact]
         public async Task CanReplaceInFile()
         {
-            File.WriteAllText("temp.txt", "delete me if found");
+            File.WriteAllText("temp.txt", "delete this if found");
             bool result;
             string replaced;
 
             try
             {
-                result = await this.Target.ReplaceInFile("temp.txt", "me", "this");
+                result = await this.Target.ReplaceInFile("temp.txt", "this", "me");
                 replaced = File.ReadAllText("temp.txt");
             }
             finally
@@ -93,7 +93,7 @@ namespace NugetRepack.UnitTests
             }
 
             result.Should().BeTrue("because that is returned when the text is found");
-            replaced.Should().Be("delete this if found", "because that reflects the replaced content");
+            replaced.Should().Be("delete me if found", "because that reflects the replaced content");
         }
 
         [Fact]
