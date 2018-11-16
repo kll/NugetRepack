@@ -119,6 +119,14 @@ dotnet_naming_symbols.constant_fields.applicable_kinds             = field
 dotnet_naming_symbols.constant_fields.applicable_accessibilities   = *
 dotnet_naming_symbols.constant_fields.required_modifiers           = const
 
+# Use PascalCase for static readonly fields
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.severity  = warning
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.symbols   = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields_should_be_pascal_case.style     = pascal_case_style
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds             = field
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities   = *
+dotnet_naming_symbols.static_readonly_fields.required_modifiers           = static,readonly
+
 # Use PascalCase for public fields
 dotnet_naming_rule.pascal_case_for_public_fields.severity          = warning
 dotnet_naming_rule.pascal_case_for_public_fields.symbols           = public_fields
@@ -137,7 +145,7 @@ dotnet_naming_symbols.any_interface.applicable_kinds               = interface
 dotnet_naming_rule.general_naming.severity                         = warning
 dotnet_naming_rule.general_naming.symbols                          = general
 dotnet_naming_rule.general_naming.style                            = pascal_case_style
-dotnet_naming_symbols.general.applicable_kinds                     = class,struct,enum,property,method,event,namespace,delegate
+dotnet_naming_symbols.general.applicable_kinds                     = class,struct,enum,property,method,event,namespace,delegate,type_parameter
 dotnet_naming_symbols.general.applicable_accessibilities           = *
 
 # Everything else is camelCase

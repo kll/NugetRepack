@@ -39,14 +39,11 @@ main() {
   get_version
 
   if [[ "${target}" = 'pack' ]]; then
-    clean
-    build
-    unittest
-    pack
-  elif [[ "${target}" = 'repack' ]]; then
-    repack
+    target_pack
   elif [[ "${target}" = 'push' ]]; then
-    push
+    target_push
+  elif [[ "${target}" = 'repush' ]]; then
+    target_repush
   else
     echo "Unknown target: ${target}"
     exit 1
@@ -153,31 +150,58 @@ get_version() {
   echo "Using informational version: ${informational_version}"
 }
 
+target_pack() {
+  clean
+  build
+  unittest
+  pack
+}
+
+target_push() {
+  target_pack
+  push
+}
+
+target_repush() {
+  repack
+  push
+}
+
 clean() {
   if [[ -d "${artifacts_dir}" ]]; then
-    echo 'Cleaning artifacts directory.'
+    echo "Cleaning '${artifacts_dir}'"
     rm --recursive --force "${artifacts_dir}"
   fi
 
-  dotnet clean --configuration "${configuration}"
-}
-
-build() {
-  dotnet build --configuration "${configuration}" /property:Version=\""${semantic_version}"\" /property:InformationalVersion=\""${informational_version}"\"
-}
-
-unittest() {
-  for project in $(ls --recursive --directory *UnitTests); do
-    dotnet test --configuration "${configuration}" --no-build --no-restore "${project}"
+  for folder in ${__dir}/**/bin/${configuration}; do
+    echo "Cleaning '${folder}'"
+    rm --recursive --force "${folder}"
   done
 }
 
+build() {
+  dotnet build  --configuration "${configuration}" \
+                /property:Version=\""${semantic_version}"\" \
+                /property:InformationalVersion=\""${informational_version}"\"
+}
+
+unittest() {
+  dotnet test --configuration "${configuration}" \
+              --no-build \
+              --no-restore
+}
+
 pack() {
-  dotnet pack --configuration "${configuration}" /property:Version=\""${semantic_version}"\" --no-build --no-restore --output "${artifacts_dir}" "${main_project}"
+  dotnet pack --configuration "${configuration}" \
+              --no-build \
+              --no-restore \
+              --output "${artifacts_dir}" \
+              /property:Version=\""${semantic_version}"\" \
+              "${main_project}"
 }
 
 repack() {
-  for package in $(ls ${artifacts_dir}/*.nupkg); do
+  for package in ${artifacts_dir}/*.nupkg; do
     $nugetrepack_path repack "${package}"
   done
 }
@@ -203,7 +227,7 @@ push() {
     fi
   fi
 
-  for package in $(ls ${artifacts_dir}/*.nupkg); do
+  for package in ${artifacts_dir}/*.nupkg; do
     dotnet nuget push "${package}" --source "${push_source}" --api-key "${push_apikey}"
   done
 }
