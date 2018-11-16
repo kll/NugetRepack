@@ -30,6 +30,7 @@ namespace NugetRepack
             string targetDirectory,
             CancellationToken cancellationToken = default(CancellationToken))
         {
+            targetDirectory = this.FileSystem.GetFullPath(targetDirectory);
             var directoryInfo = this.FileSystem.GetDirectory(targetDirectory);
 
             if (!directoryInfo.Exists)
@@ -59,7 +60,7 @@ namespace NugetRepack
         public async Task Zip(
             string rootDirectory,
             string zipFile,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             var target = ((IStream)this.FileSystem.GetFile(zipFile).OpenWrite()).ToImplementation();
 
@@ -68,6 +69,7 @@ namespace NugetRepack
                 throw new ArgumentException("ZIP file could not be created", nameof(zipFile));
             }
 
+            rootDirectory = this.FileSystem.GetFullPath(rootDirectory);
             var source = this.FileSystem.GetDirectory(rootDirectory);
             var files = source.EnumerateFiles("*", SearchOption.AllDirectories);
 

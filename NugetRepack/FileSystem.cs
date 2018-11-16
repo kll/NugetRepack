@@ -1,5 +1,7 @@
 namespace NugetRepack
 {
+    using System;
+    using System.IO;
     using System.Threading.Tasks;
 
     using Thinktecture.IO;
@@ -19,14 +21,19 @@ namespace NugetRepack
             file.Delete();
         }
 
-        public virtual IDirectoryInfo GetDirectory(string path)
+        public virtual IDirectoryInfo GetDirectory(string directoryPath)
         {
-            return new DirectoryInfoAdapter(path);
+            return new DirectoryInfoAdapter(directoryPath);
         }
 
-        public virtual IFileInfo GetFile(string fileName)
+        public virtual IFileInfo GetFile(string filePath)
         {
-            return new FileInfoAdapter(fileName);
+            return new FileInfoAdapter(filePath);
+        }
+
+        public virtual string GetFullPath(string filePath)
+        {
+            return Path.GetFullPath(filePath);
         }
 
         public virtual async Task<string> ReadAllText(string path)

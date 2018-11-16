@@ -3,71 +3,114 @@ namespace NugetRepack.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Threading.Tasks;
+    using System.Text;
 
     using Moq;
 
     using Thinktecture.IO;
+    using Thinktecture.IO.Adapters;
 
     public sealed class FakeFileSystem : FileSystem
     {
-        public FakeFileSystem(Dictionary<string, byte[]> content)
+        public FakeFileSystem()
+            : this(Path.GetPathRoot(Path.GetFullPath(Directory.GetCurrentDirectory())))
         {
-            this.Content = content;
         }
 
-        private Dictionary<string, byte[]> Content { get; }
-
-        public override IDirectoryInfo GetDirectory(string path)
+        public FakeFileSystem(string root)
         {
+            this.Root = root;
+            this.Content = new Dictionary<string, WillNotDisposeMemoryStream>();
+        }
+
+        private string Root { get; }
+
+        private Dictionary<string, WillNotDisposeMemoryStream> Content { get; }
+
+        public override IDirectoryInfo GetDirectory(string directoryPath)
+        {
+            directoryPath = Path.GetFullPath(directoryPath, this.Root);
+
             var mock = new Mock<IDirectoryInfo>();
             mock.Setup(directoryInfo => directoryInfo.EnumerateFiles(It.IsAny<string>(), It.IsAny<SearchOption>()))
                 .Returns(
-                    this.Content.Where(keyPair => keyPair.Key.StartsWith(path))
+                    this.Content.Where(keyPair => keyPair.Key.StartsWith(directoryPath))
                         .Select(keyPair => this.GetFile(keyPair.Key)));
 
             return mock.Object;
         }
 
-        public override IFileInfo GetFile(string fileName)
+        public override IFileInfo GetFile(string filePath)
         {
+            filePath = Path.GetFullPath(filePath, this.Root);
+
             var mock = new Mock<IFileInfo>();
             mock.SetupGet(fileInfo => fileInfo.FullName)
-                .Returns(fileName);
+                .Returns(filePath);
             mock.Setup(fileInfo => fileInfo.OpenRead())
                 .Returns(
                     () =>
                     {
-                        this.ThrowIfFileNotFound(fileName);
+                        this.ThrowIfFileNotFound(filePath);
 
-                        return new FakeFileStream(fileName, this.Content[fileName]);
+                        var stream = this.Content[filePath];
+                        stream.Position = 0;
+
+                        return new FakeFileStream(filePath, stream);
                     });
             mock.Setup(fileInfo => fileInfo.OpenWrite())
                 .Returns(
                     () =>
                     {
-                        if (!this.Content.ContainsKey(fileName))
+                        if (!this.Content.ContainsKey(filePath))
                         {
-                            this.Content[fileName] = new byte[10 * 1024];
+                            this.Content[filePath] = new WillNotDisposeMemoryStream();
                         }
 
-                        return new FakeFileStream(fileName, this.Content[fileName]);
+                        return new FakeFileStream(filePath, this.Content[filePath]);
                     });
 
             return mock.Object;
         }
 
-        public override async Task<string> ReadAllText(string path)
+        public override string GetFullPath(string filePath)
         {
-            // Trim the trailing nulls that are a result of the naive fake filesystem implementation.
-            return (await base.ReadAllText(path)).TrimEnd('\0');
+            return Path.GetFullPath(filePath, this.Root);
         }
 
-        public byte[] ReadAllBytes(string fileName)
+        public void AddFile(string filePath, string contents)
         {
-            this.ThrowIfFileNotFound(fileName);
+            var file = this.GetFile(filePath);
+            var stream = file.OpenWrite();
 
-            return this.Content[fileName];
+            using (var writer = new StreamWriterAdapter(stream, Encoding.UTF8))
+            {
+                writer.Write(contents);
+            }
+        }
+
+        public void AddFile(string filePath, byte[] contents)
+        {
+            var file = this.GetFile(filePath);
+            var fileStream = file.OpenWrite();
+
+            using (var memoryStream = new MemoryStreamAdapter(contents))
+            {
+                memoryStream.CopyTo(fileStream);
+            }
+        }
+
+        public byte[] ReadAllBytes(string filePath)
+        {
+            var file = this.GetFile(filePath);
+            var fileStream = file.OpenRead();
+
+            using (var memoryStream = new MemoryStreamAdapter())
+            {
+                fileStream.CopyTo(memoryStream);
+
+                return memoryStream.ToArray();
+            }
         }
 
         private void ThrowIfFileNotFound(string fileName)

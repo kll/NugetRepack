@@ -10,16 +10,6 @@ namespace NugetRepack.UnitTests
 
     public class FakeFileStream : MemoryStreamAdapter, IFileStream
     {
-        public FakeFileStream(string name)
-            : this(name, new MemoryStream())
-        {
-        }
-
-        public FakeFileStream(string name, byte[] buffer)
-            : this(name, new MemoryStream(buffer))
-        {
-        }
-
         public FakeFileStream(string name, MemoryStream stream)
             : base(stream)
         {

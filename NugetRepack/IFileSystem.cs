@@ -10,9 +10,11 @@ namespace NugetRepack
 
         void DeleteFile(string fileName);
 
-        IDirectoryInfo GetDirectory(string path);
+        IDirectoryInfo GetDirectory(string directoryPath);
 
-        IFileInfo GetFile(string fileName);
+        IFileInfo GetFile(string filePath);
+
+        string GetFullPath(string filePath);
 
         Task<string> ReadAllText(string path);
 

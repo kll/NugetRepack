@@ -3,7 +3,6 @@ namespace NugetRepack.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
-    using System.Text;
     using System.Threading.Tasks;
 
     using FluentAssertions;
@@ -12,6 +11,16 @@ namespace NugetRepack.UnitTests
 
     public class ZipperSolitaryTests
     {
+        public ZipperSolitaryTests()
+        {
+            this.FileSystem = new FakeFileSystem();
+            this.Target = new Zipper(this.FileSystem);
+        }
+
+        private FakeFileSystem FileSystem { get; }
+
+        private Zipper Target { get; }
+
         [Fact]
         public async Task CanUnzipFile()
         {
@@ -19,37 +28,30 @@ namespace NugetRepack.UnitTests
                 new Dictionary<string, string>
                 {
                     { "file.txt", "This is a text file." },
-                    { @"directory\file.txt", "This is another text file." }
+                    { Path.Combine("directory", "file.txt"), "This is another text file." },
                 });
-            var fileSystem = new FakeFileSystem(
-                new Dictionary<string, byte[]>
-                {
-                    { @"C:\file.zip", zipFile }
-                });
-            var target = new Zipper(fileSystem);
+            this.FileSystem.AddFile("file.zip", zipFile);
 
-            await target.Unzip(@"C:\file.zip", @"C:\");
+            await this.Target.Unzip(@"file.zip", "directory");
 
-            var rootFileContent = await fileSystem.ReadAllText(@"C:\file.txt");
+            var rootFileContent = await this.FileSystem.ReadAllText(Path.Combine("directory", "file.txt"));
             rootFileContent.Should().Be("This is a text file.");
-            var directoryFileContent = await fileSystem.ReadAllText(@"C:\directory\file.txt");
+            var directoryFileContent =
+                await this.FileSystem.ReadAllText(Path.Combine("directory", "directory", "file.txt"));
             directoryFileContent.Should().Be("This is another text file.");
         }
 
         [Fact]
         public async Task CanZipFile()
         {
-            var fileSystem = new FakeFileSystem(
-                new Dictionary<string, byte[]>
-                {
-                    { @"C:\directory\file.txt", Encoding.UTF8.GetBytes("This is a text file.") },
-                    { @"C:\directory\subdirectory\file.txt", Encoding.UTF8.GetBytes("This is another text file.") }
-                });
-            var target = new Zipper(fileSystem);
+            this.FileSystem.AddFile(Path.Combine("directory", "file.txt"), "This is a text file.");
+            this.FileSystem.AddFile(
+                Path.Combine("directory", "subdirectory", "file.txt"),
+                "This is another text file.");
 
-            await target.Zip(@"C:\directory", @"C:\file.zip");
+            await this.Target.Zip("directory", "file.zip");
 
-            using (var stream = new MemoryStream(fileSystem.ReadAllBytes(@"C:\file.zip")))
+            using (var stream = new MemoryStream(this.FileSystem.ReadAllBytes("file.zip")))
             {
                 using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
                 {
@@ -62,7 +64,7 @@ namespace NugetRepack.UnitTests
                         rootFileContent.Should().Be("This is a text file.");
                     }
 
-                    var directoryEntry = archive.GetEntry(@"subdirectory\file.txt");
+                    var directoryEntry = archive.GetEntry(Path.Combine("subdirectory", "file.txt"));
                     directoryEntry.Should().NotBeNull();
 
                     using (var directoryEntryReader = new StreamReader(directoryEntry.Open()))
