@@ -12,7 +12,7 @@ trap 'build_exitcode=$?; echo "Cleaning up"; rm -f nuget.config; exit $build_exi
 # configuration
 readonly dotnet_sdk_version='2.1'
 readonly gitversion_version='4.0.0-netstandard2-1-1696'
-readonly nugetrepack_version='0.1.1-rc.7'
+readonly nugetrepack_version='1.0.0'
 readonly main_project='NugetRepack.Tool'
 
 # Set magic variables for current file & dir
