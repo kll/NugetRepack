@@ -3,19 +3,10 @@
     "tasks": [
         {
             "label": "build",
-            "command": "./build",
+            "command": "./build.sh",
             "type": "process",
             "args": [
-                "--target=build"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "pack",
-            "command": "./build",
-            "type": "process",
-            "args": [
-                "--target=pack"
+                "--target=Build"
             ],
             "problemMatcher": "$msCompile"
         }
