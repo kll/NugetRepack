@@ -10,7 +10,7 @@ set -o nounset  # exit on attempts to use undeclared variables
 trap 'build_exitcode=$?; echo "Cleaning up"; rm -f nuget.config; exit $build_exitcode' INT TERM EXIT
 
 # configuration
-readonly dotnet_sdk_version='2.2'
+readonly dotnet_sdk_version='3.0'
 readonly gitversion_version='5.0.0'
 readonly nugetrepack_version='1.0.1'
 readonly main_project='NugetRepack.Tool'

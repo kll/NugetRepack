@@ -32,6 +32,12 @@ RUN apt-get update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# Install additional versions of the .NET SDK
+ARG ADDITIONAL_SDK_VERSIONS
+ARG ADDITIONAL_SDK_CHECKSUMS
+COPY setup-dotnet.sh /root/setup-dotnet.sh
+RUN chmod +x /root/setup-dotnet.sh && /root/setup-dotnet.sh "${ADDITIONAL_SDK_VERSIONS}" "${ADDITIONAL_SDK_CHECKSUMS}"
+
 # Configure non-root user
 ARG CONTAINER_USERNAME
 ARG CONTAINER_UID

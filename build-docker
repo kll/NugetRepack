@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # sane settings for the script interpreter
 set -o errexit  # exit when a command fails
