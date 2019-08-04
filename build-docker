@@ -7,7 +7,7 @@ set -o nounset  # exit on attempts to use undeclared variables
 [[ "${TRACE:-}" == 'true' ]] && set -o xtrace   # prints every expression before executing it when debugging
 
 # configuration
-readonly build_image='microsoft/dotnet:2.1-sdk'
+readonly build_image='mcr.microsoft.com/dotnet/core/sdk:latest'
 
 # Set magic variables for current file & dir
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

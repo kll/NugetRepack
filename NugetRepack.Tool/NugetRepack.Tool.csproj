@@ -5,10 +5,11 @@
     <PackAsTool>true</PackAsTool>
     <PackageType>DotnetCliTool</PackageType>
     <ToolCommandName>nugetrepack</ToolCommandName>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Description>Tool for repackaging pre-release NuGet packages as release versions without rebuilding.</Description>
-    <Copyright>Copyright 2018 Kevin Lewis</Copyright>
+    <Company>Oak Aged LLC</Company>
+    <Copyright>Copyright Oak Aged LLC</Copyright>
     <NoWarn>NU5105</NoWarn>
   </PropertyGroup>
 

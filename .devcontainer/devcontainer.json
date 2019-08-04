@@ -1,0 +1,19 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+  "name": "nugetrepack dev",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/src",
+  "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/*",
+  "shutdownAction": "stopCompose",
+  "extensions": [
+    "ms-vscode.csharp",
+    "eamodio.gitlens",
+    "editorconfig.editorconfig",
+    "mikestead.dotenv",
+    "mutantdino.resourcemonitor",
+    "vscode-icons-team.vscode-icons"
+  ]
+}

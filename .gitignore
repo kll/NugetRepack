@@ -1,16 +1,24 @@
-# IDEs
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IDE - other
 .vs/
 .vscode/
 .idea/
 
 # User specific files
 *.user
+.env
 
 # Build Results
+.tools/
 [Aa]rtifacts/
 [Tt]est-[Rr]esults/
 [Dd]ebug/
 [Rr]elease/
 [Bb]in
 [Oo]bj/
-.tools/

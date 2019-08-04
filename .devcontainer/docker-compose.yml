@@ -1,0 +1,30 @@
+version: '3.7'
+
+services:
+  dev:
+    image: ${DOCKER_REGISTRY-}nugetrepackdev
+    container_name: nugetrepackdev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - CONTAINER_USERNAME=${CONTAINER_USERNAME:-dev}
+        - CONTAINER_UID=${CONTAINER_UID:-1000}
+        - CONTAINER_GID=${CONTAINER_GID:-1000}
+
+    volumes:
+      # this is the main workspace mount
+      - ..:/src
+      # this lets you avoid setting up Git again
+      - ~/.gitconfig:/home/${CONTAINER_USERNAME}/.gitconfig
+      # this allows Git to use your SSH keys
+      - ~/.ssh:/home/${CONTAINER_USERNAME}/.ssh-localhost:ro
+      # access host configured nuget feeds and package cache
+      - ~/.nuget:/home/${CONTAINER_USERNAME}/.nuget
+
+    environment:
+      - PUSH_SOURCE
+      - PUSH_APIKEY
+
+    # overrides default command so things don't shut down after the process ends
+    command: sleep infinity
