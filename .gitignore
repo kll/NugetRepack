@@ -17,7 +17,7 @@
 # Build Results
 .tools/
 [Aa]rtifacts/
-[Tt]est-[Rr]esults/
+[Tt]est[Rr]esults/
 [Dd]ebug/
 [Rr]elease/
 [Bb]in

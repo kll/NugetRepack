@@ -6,10 +6,11 @@
   ],
   "service": "dev",
   "workspaceFolder": "/src",
-  "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/*",
+  "postCreateCommand": "mkdir -p ~/.ssh && cp -r ~/.ssh-localhost/* ~/.ssh && chmod 700 ~/.ssh && chmod 600 ~/.ssh/* && dotnet tool restore",
   "shutdownAction": "stopCompose",
   "extensions": [
     "ms-vscode.csharp",
+    "cake-build.cake-vscode",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
     "mikestead.dotenv",

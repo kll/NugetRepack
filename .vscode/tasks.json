@@ -3,13 +3,10 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet",
+            "command": "./build",
             "type": "process",
             "args": [
-                "build",
-                "${workspaceFolder}/NugetRepack.Tool/NugetRepack.Tool.csproj",
-                "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "--target=build"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -18,7 +15,7 @@
             "command": "./build",
             "type": "process",
             "args": [
-                "pack"
+                "--target=pack"
             ],
             "problemMatcher": "$msCompile"
         }

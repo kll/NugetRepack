@@ -2,16 +2,10 @@
   "version": 1,
   "isRoot": true,
   "tools": {
-    "gitversion.tool": {
-      "version": "5.0.0",
+    "cake.tool": {
+      "version": "0.34.1",
       "commands": [
-        "dotnet-gitversion"
-      ]
-    },
-    "nugetrepack.tool": {
-      "version": "1.0.1",
-      "commands": [
-        "nugetrepack"
+        "dotnet-cake"
       ]
     }
   }

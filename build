@@ -10,36 +10,16 @@ set -o nounset  # exit on attempts to use undeclared variables
 trap 'build_exitcode=$?; echo "Cleaning up"; rm -f nuget.config; exit $build_exitcode' INT TERM EXIT
 
 # configuration
-readonly main_project='NugetRepack.Tool'
+readonly pack_projects='NugetRepack.Tool'
+readonly tools_path='.tools'
 
 # Set magic variables for current file & dir
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
 
 main() {
-  local target="${1:-pack}"
-  local configuration="${2:-Release}"
-  local push_source="${3:-}"
-  local push_apikey="${4:-}"
-  local artifacts_dir="${__dir}/artifacts"
-  local semantic_version
-  local informational_version
-
-  echo "Running target '${target}' with configuration '${configuration}'."
-
   verify_prerequisites
-  get_version
-
-  if [[ "${target}" = 'pack' ]]; then
-    target_pack
-  elif [[ "${target}" = 'push' ]]; then
-    target_push
-  elif [[ "${target}" = 'repush' ]]; then
-    target_repush
-  else
-    echo "Unknown target: ${target}"
-    exit 1
-  fi
+  run_cake "$@"
 }
 
 verify_prerequisites() {
@@ -59,94 +39,9 @@ verify_dotnet() {
   echo "Using .NET core SDK version: ${found_dotnet_sdk_version}"
 }
 
-get_version() {
-  local version_json="$(dotnet gitversion)"
-  semantic_version="$(echo "${version_json}" | grep --regex='"SemVer"' | cut --delimiter='"' --fields=4)"
-  informational_version="$(echo "${version_json}" | grep --regex='"InformationalVersion"' | cut --delimiter='"' --fields=4)"
-  echo "Using semantic version: ${semantic_version}"
-  echo "Using informational version: ${informational_version}"
-}
-
-target_pack() {
-  clean
-  build
-  unittest
-  pack
-}
-
-target_push() {
-  target_pack
-  push
-}
-
-target_repush() {
-  repack
-  push
-}
-
-clean() {
-  if [[ -d "${artifacts_dir}" ]]; then
-    echo "Cleaning '${artifacts_dir}'"
-    rm --recursive --force "${artifacts_dir}"
-  fi
-
-  for folder in ${__dir}/**/bin/${configuration}; do
-    echo "Cleaning '${folder}'"
-    rm --recursive --force "${folder}"
-  done
-}
-
-build() {
-  dotnet build  --configuration "${configuration}" \
-                /property:Version=\""${semantic_version}"\" \
-                /property:InformationalVersion=\""${informational_version}"\"
-}
-
-unittest() {
-  dotnet test --configuration "${configuration}" \
-              --no-build \
-              --no-restore
-}
-
-pack() {
-  dotnet pack --configuration "${configuration}" \
-              --no-build \
-              --no-restore \
-              --output "${artifacts_dir}" \
-              /property:Version=\""${semantic_version}"\" \
-              "${main_project}"
-}
-
-repack() {
-  for package in ${artifacts_dir}/*.nupkg; do
-    dotnet nugetrepack repack "${package}"
-  done
-}
-
-push() {
-  if [[ -z "${push_source}" ]]; then
-    push_source="${PUSH_SOURCE:-}"
-
-    if [[ -z "${push_source}" ]]; then
-      echo "No push source provided."
-      echo "It can be passed as the 3rd positional argument or set in the PUSH_SOURCE environment variable."
-      exit 1
-    fi
-  fi
-
-  if [[ -z "${push_apikey}" ]]; then
-    push_apikey="${PUSH_APIKEY:-}"
-
-    if [[ -z "${push_apikey}" ]]; then
-      echo "No push API key provided."
-      echo "It can be passed as the 4rth positional argument or set in the PUSH_APIKEY environment variable."
-      exit 1
-    fi
-  fi
-
-  for package in ${artifacts_dir}/*.nupkg; do
-    dotnet nuget push "${package}" --source "${push_source}" --api-key "${push_apikey}"
-  done
+run_cake() {
+  dotnet cake --paths_tools="${tools_path}" --bootstrap
+  dotnet cake --paths_tools="${tools_path}" --projects="${pack_projects}" "$@"
 }
 
 main "$@"
