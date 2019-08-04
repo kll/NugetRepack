@@ -1,3 +1,6 @@
+// Copyright (c) Oak Aged LLC. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace NugetRepack.UnitTests
 {
     using System.IO;
@@ -7,11 +10,11 @@ namespace NugetRepack.UnitTests
 
     using Xunit;
 
-    /// <summary>
+    /// <remark>
     /// I called these tests social because they interact with the real file
     /// system and classes from Thinktecture.IO. No other classes from this
-    /// code base are used though so maybe solitary is the right description?
-    /// </summary>
+    /// code base are used though so perhaps solitary is a better description.
+    /// </remark>
     public class FileSystemSocialTests
     {
         public FileSystemSocialTests()
