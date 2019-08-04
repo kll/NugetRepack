@@ -54,6 +54,9 @@ RUN sed -i '/en_US.UTF-8/s/^#*//' /etc/locale.gen \
     && locale-gen \
     && echo 'LANG=en_US.UTF-8' > /etc/locale.conf
 
+# Fix the home and end keys
+RUN sed -i '/\"\\e\[[HF]\"/s/^#* *//' /etc/inputrc
+
 # Configure shell
 ENV SHELL /bin/zsh
 COPY .zshrc /home/${CONTAINER_USERNAME}/.zshrc

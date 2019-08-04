@@ -16,7 +16,7 @@ compinit
 export EDITOR=nvim
 
 # Add dotnet global tools to the path
-export PATH="${PATH}:/root/.dotnet/tools"
+export PATH="${PATH}:/home/${USER}/.dotnet/tools"
 
 # Start of antigen configuration
 source /usr/share/zsh-antigen/antigen.zsh
@@ -26,7 +26,7 @@ source /usr/share/zsh-antigen/antigen.zsh
 zstyle :omz:plugins:ssh-agent identities id_ed25519 id_github id_gitlab
 
 # Load the oh-my-zsh's library.
-antigen user oh-my-zsh
+antigen use oh-my-zsh
 
 # Bundles from the default repo (robbyrussell's oh-my-zsh).
 antigen bundle command-not-found
