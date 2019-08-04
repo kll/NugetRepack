@@ -5,7 +5,7 @@
     <Description>Tool for repackaging pre-release NuGet packages as release versions without rebuilding.</Description>
     <Product>NugetRepack</Product>
     <Company>Oak Aged LLC</Company>
-    <Copyright>Copyright Oak Aged LLC</Copyright>
+    <Copyright>Copyright (c) Oak Aged LLC. All rights reserved.</Copyright>
   </PropertyGroup>
 
 <!-- Lanugage Features -->
@@ -37,6 +37,10 @@
     -->
     <NoWarn>$(NoWarn),NU5105</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)/.stylecop.json" Link=".stylecop.json" />
+  </ItemGroup>
 
   <!--
     Only turn on TreatWarningsAsErrors for builds outside of an IDE.
