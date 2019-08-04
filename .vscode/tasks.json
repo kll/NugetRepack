@@ -5,6 +5,11 @@
             "label": "build",
             "command": "./build.sh",
             "type": "process",
+            "options": {
+              "env": {
+                "DoNotEnforceStyle": "true"
+              }
+            },
             "args": [
                 "--target=Build"
             ],

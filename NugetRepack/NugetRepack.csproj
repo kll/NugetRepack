@@ -2,10 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Description>Utility for repackaging pre-release NuGet packages as release versions without rebuilding.</Description>
-    <Company>Oak Aged LLC</Company>
-    <Copyright>Copyright Oak Aged LLC</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,10 +19,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Serilog" Version="2.7.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Thinktecture.IO.Abstractions" Version="2.4.0" />
     <PackageReference Include="Thinktecture.IO.FileSystem.Abstractions" Version="2.4.0" />
   </ItemGroup>

@@ -1,0 +1,54 @@
+<Project>
+
+  <!-- Project Metadata -->
+  <PropertyGroup>
+    <Description>Tool for repackaging pre-release NuGet packages as release versions without rebuilding.</Description>
+    <Product>NugetRepack</Product>
+    <Company>Oak Aged LLC</Company>
+    <Copyright>Copyright Oak Aged LLC</Copyright>
+  </PropertyGroup>
+
+<!-- Lanugage Features -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Features>strict</Features>
+    <DefineConstants>CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Debugging -->
+  <PropertyGroup>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedAllSources>true</EmbedAllSources>
+  </PropertyGroup>
+
+  <!-- Packaging -->
+  <PropertyGroup Condition="'$(DebugType)' == 'portable'">
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <!-- Coding Standards -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <!-- <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)NugetRepack.ruleset</CodeAnalysisRuleSet> -->
+    <!--
+      Document any disabled warnings here.
+      NU5105: Don't warn about SemVer 2.0.0 version number.
+    -->
+    <NoWarn>$(NoWarn),NU5105</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    Only turn on TreatWarningsAsErrors for builds outside of an IDE.
+    This way we can benefit from it but not be annoyed while we develop! :)
+  -->
+  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true' And '$(DoNotEnforceStyle)' != 'true'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- Common Nuget references -->
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

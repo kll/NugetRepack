@@ -6,11 +6,6 @@
     <PackageType>DotnetCliTool</PackageType>
     <ToolCommandName>nugetrepack</ToolCommandName>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Description>Tool for repackaging pre-release NuGet packages as release versions without rebuilding.</Description>
-    <Company>Oak Aged LLC</Company>
-    <Copyright>Copyright Oak Aged LLC</Copyright>
-    <NoWarn>NU5105</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,10 +13,6 @@
     <PackageReference Include="Oakton" Version="1.5.0" />
     <PackageReference Include="Serilog" Version="2.7.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta009">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
