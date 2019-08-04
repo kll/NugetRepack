@@ -10,9 +10,6 @@ set -o nounset  # exit on attempts to use undeclared variables
 trap 'build_exitcode=$?; echo "Cleaning up"; rm -f nuget.config; exit $build_exitcode' INT TERM EXIT
 
 # configuration
-readonly dotnet_sdk_version='3.0'
-readonly gitversion_version='5.0.0'
-readonly nugetrepack_version='1.0.1'
 readonly main_project='NugetRepack.Tool'
 
 # Set magic variables for current file & dir
@@ -25,11 +22,6 @@ main() {
   local push_source="${3:-}"
   local push_apikey="${4:-}"
   local artifacts_dir="${__dir}/artifacts"
-  local tools_dir="${__dir}/.tools"
-  local gitversion_install="${tools_dir}/gitversion"
-  local gitversion_path="${gitversion_install}/dotnet-gitversion"
-  local nugetrepack_install="${tools_dir}/nugetrepack"
-  local nugetrepack_path="${nugetrepack_install}/nugetrepack"
   local semantic_version
   local informational_version
 
@@ -52,8 +44,7 @@ main() {
 
 verify_prerequisites() {
   verify_dotnet
-  verify_gitversion
-  verify_nugetrepack
+  dotnet tool restore
 }
 
 verify_dotnet() {
@@ -65,81 +56,11 @@ verify_dotnet() {
 
   # Check the version
   local found_dotnet_sdk_version="$(dotnet --version)"
-  if echo "${found_dotnet_sdk_version}" | grep --regex="^${dotnet_sdk_version}" --quiet; then
-    echo "Using .NET core SDK version: ${found_dotnet_sdk_version}"
-  else
-    echo "Incorrect version of .NET core SDK detected! Found version: ${found_dotnet_sdk_version}, expected version compatible with: ${dotnet_sdk_version}"
-    exit 1
-  fi
-}
-
-verify_gitversion() {
-  local recurse="${1:-true}"
-
-  # Ensure gitversion is available.
-  if ! [ -x "$(command -v ${gitversion_path})" ]; then
-    install_gitversion
-  fi
-
-  local found_gitversion_version="$(MSYS_NO_PATHCONV=1 ${gitversion_path} /version)"
-
-  if echo "${found_gitversion_version}" | grep --regex="^${gitversion_version}" --quiet; then
-    echo "Using GitVersion version: ${found_gitversion_version}"
-  else
-    if [[ "${recurse}" = 'true' ]]; then
-      install_gitversion
-      verify_gitversion false
-    else
-      echo "Failed to install correct version of GitVersion."
-      exit 1
-    fi
-  fi
-}
-
-install_gitversion() {
-  if [[ -d "${gitversion_install}" ]]; then
-    echo 'Deleting old GitVersion installation.'
-    rm --recursive --force "${gitversion_install}"
-  fi
-
-  echo 'Installing GitVersion.'
-  dotnet tool install GitVersion.Tool --version "${gitversion_version}" --tool-path "${gitversion_install}"
-}
-
-verify_nugetrepack() {
-  local recurse="${1:-true}"
-
-  # Ensure nugetrepack is available.
-  if ! [ -x "$(command -v ${nugetrepack_path})" ]; then
-    install_nugetrepack
-  fi
-
-  local found_nugetrepack_version="$(${nugetrepack_path} version)"
-  if echo "${found_nugetrepack_version}" | grep --regex="^${nugetrepack_version}" --quiet; then
-    echo "Using NugetRepack version: ${found_nugetrepack_version}"
-  else
-    if [[ "${recurse}" = 'true' ]]; then
-      install_nugetrepack
-      verify_nugetrepack false
-    else
-      echo "Failed to install correct version of NugetRepack."
-      exit 1
-    fi
-  fi
-}
-
-install_nugetrepack() {
-  if [[ -d "${nugetrepack_install}" ]]; then
-    echo 'Deleting old NugetRepack installation.'
-    rm --recursive --force "${nugetrepack_install}"
-  fi
-
-  echo 'Installing NugetRepack.'
-  dotnet tool install NugetRepack.Tool --version "${nugetrepack_version}" --tool-path "${nugetrepack_install}"
+  echo "Using .NET core SDK version: ${found_dotnet_sdk_version}"
 }
 
 get_version() {
-  local version_json="$(${gitversion_path})"
+  local version_json="$(dotnet gitversion)"
   semantic_version="$(echo "${version_json}" | grep --regex='"SemVer"' | cut --delimiter='"' --fields=4)"
   informational_version="$(echo "${version_json}" | grep --regex='"InformationalVersion"' | cut --delimiter='"' --fields=4)"
   echo "Using semantic version: ${semantic_version}"
@@ -198,7 +119,7 @@ pack() {
 
 repack() {
   for package in ${artifacts_dir}/*.nupkg; do
-    $nugetrepack_path repack "${package}"
+    dotnet nugetrepack repack "${package}"
   done
 }
 

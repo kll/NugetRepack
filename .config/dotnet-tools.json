@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "gitversion.tool": {
+      "version": "5.0.0",
+      "commands": [
+        "dotnet-gitversion"
+      ]
+    },
+    "nugetrepack.tool": {
+      "version": "1.0.1",
+      "commands": [
+        "nugetrepack"
+      ]
+    }
+  }
+}
