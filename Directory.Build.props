@@ -30,7 +30,7 @@
   <!-- Coding Standards -->
   <PropertyGroup>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <!-- <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)NugetRepack.ruleset</CodeAnalysisRuleSet> -->
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)NugetRepack.ruleset</CodeAnalysisRuleSet>
     <!--
       Document any disabled warnings here.
       NU5105: Don't warn about SemVer 2.0.0 version number.

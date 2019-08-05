@@ -10,10 +10,14 @@ namespace NugetRepack.UnitTests
 
     using Xunit;
 
+    /// <summary>
+    /// Tests for FileSystem that interact with other classes.
+    /// </summary>
     /// <remark>
     /// I called these tests social because they interact with the real file
     /// system and classes from Thinktecture.IO. No other classes from this
-    /// code base are used though so perhaps solitary is a better description.
+    /// code base are used though so solitary could fit as well. It is a gray
+    /// area.
     /// </remark>
     public class FileSystemSocialTests
     {

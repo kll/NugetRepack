@@ -22,6 +22,12 @@ namespace NugetRepack.UnitTests
 
         public MemoryStream Contents => this.Implementation;
 
+        public bool IsAsync { get; }
+
+        public string Name { get; }
+
+        public ISafeFileHandle SafeFileHandle => throw new NotImplementedException();
+
         Stream IAbstraction<Stream>.UnsafeConvert()
         {
             return this.Implementation;
@@ -43,11 +49,5 @@ namespace NugetRepack.UnitTests
         public void Unlock(long position, long length)
         {
         }
-
-        public bool IsAsync { get; }
-
-        public string Name { get; }
-
-        public ISafeFileHandle SafeFileHandle => throw new NotImplementedException();
     }
 }

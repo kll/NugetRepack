@@ -31,7 +31,7 @@ namespace NugetRepack
         public async Task Unzip(
             string zipFile,
             string targetDirectory,
-            CancellationToken cancellationToken = default(CancellationToken))
+            CancellationToken cancellationToken = default)
         {
             targetDirectory = this.FileSystem.GetFullPath(targetDirectory);
             var directoryInfo = this.FileSystem.GetDirectory(targetDirectory);

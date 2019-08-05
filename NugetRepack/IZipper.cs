@@ -3,8 +3,6 @@
 
 namespace NugetRepack
 {
-    using System.Collections.Generic;
-    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -15,11 +13,11 @@ namespace NugetRepack
         Task Unzip(
             [NotNull] string zipFile,
             [NotNull] string targetDirectory,
-            CancellationToken cancellationToken = default(CancellationToken));
+            CancellationToken cancellationToken = default);
 
         Task Zip(
             [NotNull] string rootDirectory,
             [NotNull] string zipFile,
-            CancellationToken cancellationToken = default(CancellationToken));
+            CancellationToken cancellationToken = default);
     }
 }
