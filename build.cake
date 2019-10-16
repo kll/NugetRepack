@@ -1,8 +1,8 @@
 // Install modules
-#module nuget:?package=Cake.DotNetTool.Module&version=0.3.0
+#module nuget:?package=Cake.DotNetTool.Module&version=0.3.1
 
 // Install .NET Core tools.
-#tool dotnet:?package=GitVersion.Tool&version=5.0.0
+#tool dotnet:?package=GitVersion.Tool&version=5.0.1
 #tool dotnet:?package=NugetRepack.Tool&version=1.0.1
 
 public class BuildData

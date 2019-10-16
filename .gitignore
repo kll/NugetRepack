@@ -15,7 +15,7 @@
 .env
 
 # Build Results
-.tools/
+[Tt]ools/
 [Aa]rtifacts/
 [Tt]est[Rr]esults/
 [Dd]ebug/

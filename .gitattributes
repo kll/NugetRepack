@@ -1,5 +1,3 @@
-# Set default behavior to automatically normalize line endings.
-*       text=auto
-
-# Shell scripts require LF
-*.sh    text  eol=lf
+# Set default behavior to automatically use LF so things don't get messed up
+# round tripping between the container and directly opening the folder.
+*       text=auto eol=lf
