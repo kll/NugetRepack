@@ -3,6 +3,7 @@
 
 namespace NugetRepack.UnitTests
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -22,8 +23,13 @@ namespace NugetRepack.UnitTests
         {
         }
 
-        public FakeFileSystem(string root)
+        public FakeFileSystem(string? root)
         {
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                throw new ArgumentNullException("file system root is required", nameof(root));
+            }
+
             this.Root = root;
             this.Content = new Dictionary<string, WillNotDisposeMemoryStream>();
         }
@@ -90,10 +96,9 @@ namespace NugetRepack.UnitTests
         {
             var file = this.GetFile(filePath);
 
-            using (var reader = new StreamReaderAdapter(file.OpenRead()))
-            {
-                return reader.ReadToEndAsync();
-            }
+            using var reader = new StreamReaderAdapter(file.OpenRead());
+
+            return reader.ReadToEndAsync();
         }
 
         public override async Task WriteAllText(string filePath, string contents, CancellationToken cancellationToken = default)
@@ -115,10 +120,8 @@ namespace NugetRepack.UnitTests
             var file = this.GetFile(filePath);
             var stream = file.OpenWrite();
 
-            using (var writer = new StreamWriterAdapter(stream, Encoding.UTF8))
-            {
-                writer.Write(contents);
-            }
+            using var writer = new StreamWriterAdapter(stream, Encoding.UTF8);
+            writer.Write(contents);
         }
 
         public void AddFile(string filePath, byte[] contents)
@@ -126,10 +129,8 @@ namespace NugetRepack.UnitTests
             var file = this.GetFile(filePath);
             var fileStream = file.OpenWrite();
 
-            using (var memoryStream = new MemoryStreamAdapter(contents))
-            {
-                memoryStream.CopyTo(fileStream);
-            }
+            using var memoryStream = new MemoryStreamAdapter(contents);
+            memoryStream.CopyTo(fileStream);
         }
 
         public byte[] ReadAllBytes(string filePath)
@@ -137,12 +138,10 @@ namespace NugetRepack.UnitTests
             var file = this.GetFile(filePath);
             var fileStream = file.OpenRead();
 
-            using (var memoryStream = new MemoryStreamAdapter())
-            {
-                fileStream.CopyTo(memoryStream);
+            using var memoryStream = new MemoryStreamAdapter();
+            fileStream.CopyTo(memoryStream);
 
-                return memoryStream.ToArray();
-            }
+            return memoryStream.ToArray();
         }
 
         private void ThrowIfFileNotFound(string fileName)

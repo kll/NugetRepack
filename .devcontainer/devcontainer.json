@@ -13,7 +13,8 @@
     "cake-build.cake-vscode",
     "eamodio.gitlens",
     "editorconfig.editorconfig",
+    "formulahendry.dotnet-test-explorer",
     "mikestead.dotenv",
-    "mutantdino.resourcemonitor",
+    "mutantdino.resourcemonitor"
   ]
 }

@@ -10,19 +10,18 @@ namespace NugetRepack.UnitTests
     public class PackageFilenameParserSolitaryTests
     {
         [Theory]
-        [InlineData("AwesomePackage.1.0.0.nupkg", "AwesomePackage", "1.0.0", "1.0.0")]
-        [InlineData("AwesomePackage.1.0.0-beta.nupkg", "AwesomePackage", "1.0.0-beta", "1.0.0")]
-        [InlineData("AwesomePackage.1.0.0-beta.2.nupkg", "AwesomePackage", "1.0.0-beta.2", "1.0.0")]
-        [InlineData("AwesomePackage.1.0.0-beta.2+build.4.nupkg", "AwesomePackage", "1.0.0-beta.2+build.4", "1.0.0")]
-        public void CanParsePackageName(string filename, string packageName, string currentVersion, string newVersion)
+        [InlineData("AwesomePackage.1.0.0.nupkg", "AwesomePackage", "1.0.0")]
+        [InlineData("AwesomePackage.1.0.0-beta.nupkg", "AwesomePackage", "1.0.0-beta")]
+        [InlineData("AwesomePackage.1.0.0-beta.2.nupkg", "AwesomePackage", "1.0.0-beta.2")]
+        [InlineData("AwesomePackage.1.0.0-beta.2+build.4.nupkg", "AwesomePackage", "1.0.0-beta.2+build.4")]
+        public void CanParsePackageName(string filename, string packageName, string fullVersion)
         {
             var target = new PackageFilenameParser();
 
             var parsed = target.Parse(filename);
 
-            parsed.name.Should().Be(packageName);
-            parsed.currentVersion.Should().Be(currentVersion);
-            parsed.newVersion.Should().Be(newVersion);
+            parsed.Name.Should().Be(packageName);
+            parsed.FullVersion.Should().Be(fullVersion);
         }
     }
 }

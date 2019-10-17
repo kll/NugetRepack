@@ -11,6 +11,7 @@
 <!-- Lanugage Features -->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <Features>strict</Features>
     <DefineConstants>CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>

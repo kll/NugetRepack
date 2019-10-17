@@ -29,11 +29,18 @@ namespace NugetRepack.Tool
         {
             this.LoggingLevelSwitch.MinimumLevel = input.LogLevelFlag;
 
+            if (string.IsNullOrWhiteSpace(input.PackageFile))
+            {
+                Logger.Fatal("missing required package file parameter");
+
+                return false;
+            }
+
             Logger.Verbose("Repacking file: {File}", input.PackageFile);
 
             try
             {
-                await this.NugetRepacker.RepackPackage(input.PackageFile);
+                await this.NugetRepacker.RepackPackage(input.PackageFile, input.StripPrereleaseFlag);
 
                 return true;
             }

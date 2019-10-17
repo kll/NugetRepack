@@ -14,6 +14,8 @@ namespace NugetRepack
 
         void DeleteFile(string fileName);
 
+        void MoveFile(string sourceFile, string targetFile);
+
         IDirectoryInfo GetDirectory(string directoryPath);
 
         IFileInfo GetFile(string filePath);
@@ -21,8 +23,6 @@ namespace NugetRepack
         string GetFullPath(string filePath);
 
         Task<string> ReadAllText(string path, CancellationToken cancellationToken = default);
-
-        Task<bool> ReplaceInFile(string path, string findText, string replaceText);
 
         Task WriteAllText(string path, string contents, CancellationToken cancellationToken = default);
     }

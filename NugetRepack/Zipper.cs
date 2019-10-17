@@ -51,12 +51,11 @@ namespace NugetRepack
                 throw new ArgumentException("ZIP file not found", nameof(zipFile));
             }
 
-            using (var archive = new ZipArchive(source, ZipArchiveMode.Read))
+            using var archive = new ZipArchive(source, ZipArchiveMode.Read);
+
+            foreach (var entry in archive.Entries)
             {
-                foreach (var entry in archive.Entries)
-                {
-                    await this.Extract(entry, targetDirectory, cancellationToken);
-                }
+                await this.Extract(entry, targetDirectory, cancellationToken);
             }
         }
 
@@ -76,14 +75,13 @@ namespace NugetRepack
             var source = this.FileSystem.GetDirectory(rootDirectory);
             var files = source.EnumerateFiles("*", SearchOption.AllDirectories);
 
-            using (var archive = new ZipArchive(target, ZipArchiveMode.Create))
+            using var archive = new ZipArchive(target, ZipArchiveMode.Create);
+
+            foreach (var file in files)
             {
-                foreach (var file in files)
-                {
-                    var relativePath = Path.GetRelativePath(rootDirectory, file.FullName);
-                    var entry = archive.CreateEntry(relativePath);
-                    await this.Compress(entry, file, cancellationToken);
-                }
+                var relativePath = Path.GetRelativePath(rootDirectory, file.FullName);
+                var entry = archive.CreateEntry(relativePath);
+                await this.Compress(entry, file, cancellationToken);
             }
         }
 
@@ -104,13 +102,9 @@ namespace NugetRepack
         {
             Logger.Verbose("Compressing file: {File}", sourceFile.FullName);
 
-            using (var source = sourceFile.OpenRead())
-            {
-                using (var destination = entry.Open())
-                {
-                    await source.CopyToAsync(destination, cancellationToken);
-                }
-            }
+            using var source = sourceFile.OpenRead();
+            using var destination = entry.Open();
+            await source.CopyToAsync(destination, cancellationToken);
         }
 
         private async Task Extract(ZipArchiveEntry entry, string targetDirectory, CancellationToken cancellationToken)
@@ -126,21 +120,17 @@ namespace NugetRepack
                 return;
             }
 
-            using (var source = new StreamAdapter(entry.Open()))
+            using var source = new StreamAdapter(entry.Open());
+            var file = this.FileSystem.GetFile(destinationPath);
+            var directory = file.Directory;
+
+            if (directory?.Exists == false)
             {
-                var file = this.FileSystem.GetFile(destinationPath);
-                var directory = file.Directory;
-
-                if (directory?.Exists == false)
-                {
-                    directory.Create();
-                }
-
-                using (var destination = file.OpenWrite())
-                {
-                    await source.CopyToAsync(destination, cancellationToken);
-                }
+                directory.Create();
             }
+
+            using var destination = file.OpenWrite();
+            await source.CopyToAsync(destination, cancellationToken);
         }
     }
 }

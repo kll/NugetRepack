@@ -13,7 +13,7 @@ namespace NugetRepack.Tool
         public override bool Execute(VersionInput input)
         {
             var version = Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>();
-            Console.WriteLine(version.InformationalVersion);
+            Console.WriteLine(version?.InformationalVersion ?? "unknown");
 
             return true;
         }

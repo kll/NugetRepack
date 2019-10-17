@@ -54,29 +54,21 @@ namespace NugetRepack.UnitTests
 
             await this.Target.Zip("directory", "file.zip");
 
-            using (var stream = new MemoryStream(this.FileSystem.ReadAllBytes("file.zip")))
-            {
-                using (var archive = new ZipArchive(stream, ZipArchiveMode.Read))
-                {
-                    var rootFileEntry = archive.GetEntry("file.txt");
-                    rootFileEntry.Should().NotBeNull();
+            using var stream = new MemoryStream(this.FileSystem.ReadAllBytes("file.zip"));
+            using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
+            var rootFileEntry = archive.GetEntry("file.txt");
+            rootFileEntry.Should().NotBeNull();
 
-                    using (var rootFileReader = new StreamReader(rootFileEntry.Open()))
-                    {
-                        var rootFileContent = rootFileReader.ReadToEnd();
-                        rootFileContent.Should().Be("This is a text file.");
-                    }
+            using var rootFileReader = new StreamReader(rootFileEntry.Open());
+            var rootFileContent = rootFileReader.ReadToEnd();
+            rootFileContent.Should().Be("This is a text file.");
 
-                    var directoryEntry = archive.GetEntry(Path.Combine("subdirectory", "file.txt"));
-                    directoryEntry.Should().NotBeNull();
+            var directoryEntry = archive.GetEntry(Path.Combine("subdirectory", "file.txt"));
+            directoryEntry.Should().NotBeNull();
 
-                    using (var directoryEntryReader = new StreamReader(directoryEntry.Open()))
-                    {
-                        var directoryFileContent = directoryEntryReader.ReadToEnd();
-                        directoryFileContent.Should().Be("This is another text file.");
-                    }
-                }
-            }
+            using var directoryEntryReader = new StreamReader(directoryEntry.Open());
+            var directoryFileContent = directoryEntryReader.ReadToEnd();
+            directoryFileContent.Should().Be("This is another text file.");
         }
     }
 }

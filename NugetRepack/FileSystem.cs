@@ -24,6 +24,12 @@ namespace NugetRepack
             file.Delete();
         }
 
+        public virtual void MoveFile(string sourceFile, string targetFile)
+        {
+            var file = this.GetFile(sourceFile);
+            file.MoveTo(targetFile);
+        }
+
         public virtual IDirectoryInfo GetDirectory(string directoryPath)
         {
             return new DirectoryInfoAdapter(directoryPath);
@@ -44,22 +50,6 @@ namespace NugetRepack
             var adapter = new FileAdapter();
 
             return await adapter.ReadAllTextAsync(path, cancellationToken);
-        }
-
-        public virtual async Task<bool> ReplaceInFile(string path, string findText, string replaceText)
-        {
-            var contents = await this.ReadAllText(path);
-
-            if (!contents.Contains(findText))
-            {
-                return false;
-            }
-
-            contents = contents.Replace(findText, replaceText);
-
-            await this.WriteAllText(path, contents);
-
-            return true;
         }
 
         public virtual async Task WriteAllText(

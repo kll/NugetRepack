@@ -34,25 +34,28 @@ namespace NugetRepack
 
         private IZipper Zipper { get; }
 
-        public async Task RepackPackage(string package)
+        public async Task RepackPackage(string package, bool stripPrerelease)
         {
             Logger.Verbose("Repacking package: {Package}", package);
 
-            var (packageName, currentVersion, newVersion) = this.Parser.Parse(package);
-            Logger.Information(
-                "Changing version of package '{PackageName}' from '{CurrentVersion}' to '{NewVersion}'",
-                packageName,
-                currentVersion,
-                newVersion);
-            var tempFolder = GenerateTemporaryDirectoryName();
+            var packageInfo = this.Parser.Parse(package);
+            var version = stripPrerelease ? packageInfo.FullVersionWithoutPrerelease : packageInfo.FullVersion;
+
+            var tempFolder = GenerateTemporaryPath();
             await this.Zipper.Unzip(package, tempFolder);
-            await this.NuspecUpdater.UpdateNuspec(tempFolder, currentVersion, newVersion);
-            var newPackage = GetNewPackageName(package, packageName, newVersion);
-            await this.Zipper.Zip(tempFolder, newPackage);
+
+            await this.NuspecUpdater.UpdateNuspec(tempFolder, version);
+
+            var tempFile = GenerateTemporaryPath();
+            await this.Zipper.Zip(tempFolder, tempFile);
+
             this.Cleanup(package, tempFolder);
+
+            var newPackage = GetNewPackageName(package, packageInfo.Name, version);
+            this.FileSystem.MoveFile(tempFile, newPackage);
         }
 
-        private static string GenerateTemporaryDirectoryName()
+        private static string GenerateTemporaryPath()
         {
             return Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         }

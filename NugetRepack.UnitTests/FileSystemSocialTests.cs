@@ -83,24 +83,22 @@ namespace NugetRepack.UnitTests
         }
 
         [Fact]
-        public async Task CanReplaceInFile()
+        public void CanMoveFile()
         {
-            File.WriteAllText("temp.txt", "delete this if found");
-            bool result;
-            string replaced;
+            File.WriteAllText("foo.txt", "delete this if found");
 
             try
             {
-                result = await this.Target.ReplaceInFile("temp.txt", "this", "me");
-                replaced = File.ReadAllText("temp.txt");
+                this.Target.MoveFile("foo.txt", "bar.txt");
+
+                File.Exists("bar.txt").Should().BeTrue("the file was renamed");
+                File.Exists("foo.txt").Should().BeFalse("the file was renamed");
             }
             finally
             {
-                File.Delete("temp.txt");
+                File.Delete("foo.txt");
+                File.Delete("bar.txt");
             }
-
-            result.Should().BeTrue("because that is returned when the text is found");
-            replaced.Should().Be("delete me if found", "because that reflects the replaced content");
         }
 
         [Fact]

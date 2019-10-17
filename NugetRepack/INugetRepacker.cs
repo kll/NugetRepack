@@ -7,6 +7,6 @@ namespace NugetRepack
 
     public interface INugetRepacker
     {
-        Task RepackPackage(string package);
+        Task RepackPackage(string package, bool stripPrerelease);
     }
 }

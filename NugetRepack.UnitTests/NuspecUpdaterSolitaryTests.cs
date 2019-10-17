@@ -44,7 +44,7 @@ namespace NugetRepack.UnitTests
         {
             this.FileSystem.AddFile("file.nuspec", OriginalNuspec);
 
-            await this.Target.UpdateNuspec("file.nuspec", "0.1.5-rc.11", "0.1.5");
+            await this.Target.UpdateNuspec("file.nuspec", "0.1.5");
 
             var result = await this.FileSystem.ReadAllText("file.nuspec");
             result.Should().Be(UpdatedNuspec);

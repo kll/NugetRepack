@@ -5,6 +5,7 @@ namespace NugetRepack
 {
     using System.IO;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     using Serilog;
@@ -20,7 +21,7 @@ namespace NugetRepack
 
         private IFileSystem FileSystem { get; }
 
-        public async Task UpdateNuspec(string path, string currentVersion, string newVersion)
+        public async Task UpdateNuspec(string path, string version)
         {
             var source = this.FileSystem.GetDirectory(path);
             var files = source.EnumerateFiles("*.nuspec", SearchOption.AllDirectories).ToList();
@@ -37,15 +38,29 @@ namespace NugetRepack
 
             var nuspec = files.First();
 
-            Logger.Verbose("Updating version in nuspec file: {File}", nuspec.FullName);
+            var content = await this.FileSystem.ReadAllText(nuspec.FullName);
 
-            var replaced = await this.FileSystem.ReplaceInFile(nuspec.FullName, currentVersion, newVersion);
+            content = this.UpdateVersion(content, version);
 
-            if (!replaced)
+            await this.FileSystem.WriteAllText(nuspec.FullName, content);
+        }
+
+        private string UpdateVersion(string content, string version)
+        {
+            var regex = new Regex(@"<version>(?<version>.*)</version>");
+            var match = regex.Match(content);
+
+            if (!match.Success || !match.Groups.ContainsKey("version"))
             {
-                throw new NuspecNotUpdatedException(
-                    $"Failed to update the version number in nuspec file: {nuspec.FullName}");
+                throw new NuspecNotUpdatedException($"Failed to locate the version number in the nuspec file.");
             }
+
+            Logger.Verbose(
+                "Updating version in nuspec file from {CurrentVersion} to {NewVersion}",
+                match.Groups["version"].Value,
+                version);
+
+            return regex.Replace(content, $"<version>{version}</version>");
         }
     }
 }

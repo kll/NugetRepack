@@ -13,7 +13,7 @@ namespace NugetRepack
             @"^(?<name>[0-9A-Za-z-\.]+)\.(?<version>\d+\.\d+\.\d+)(-(?<prerelease>[0-9A-Za-z-\.]+))?(\+(?<metadata>[0-9A-Za-z-\.]+))?$",
             RegexOptions.ExplicitCapture);
 
-        public (string name, string currentVersion, string newVersion) Parse(string package)
+        public PackageInfo Parse(string package)
         {
             var baseName = Path.GetFileNameWithoutExtension(package);
             var match = PackageRegex.Match(baseName);
@@ -25,22 +25,13 @@ namespace NugetRepack
             }
 
             var packageName = match.Groups["name"].Value;
-            var newVersion = match.Groups["version"].Value;
-            var currentVersion = newVersion;
+            var version = match.Groups["version"].Value;
             var prerelease = match.Groups["prerelease"].Value;
             var metadata = match.Groups["metadata"].Value;
 
-            if (!string.IsNullOrWhiteSpace(prerelease))
-            {
-                currentVersion = $"{currentVersion}-{prerelease}";
-            }
+            var packageInfo = new PackageInfo(packageName, version, prerelease, metadata);
 
-            if (!string.IsNullOrWhiteSpace(metadata))
-            {
-                currentVersion = $"{currentVersion}+{metadata}";
-            }
-
-            return (packageName, currentVersion, newVersion);
+            return packageInfo;
         }
     }
 }
