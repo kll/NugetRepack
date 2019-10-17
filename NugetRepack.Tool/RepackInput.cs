@@ -15,6 +15,9 @@ namespace NugetRepack.Tool
         [Description("The logging level to use. Default: Information")]
         public LogEventLevel LogLevelFlag { get; set; } = LogEventLevel.Information;
 
+        [Description("Change the NuGet package ID to a different value.")]
+        public string? NewPackageIdFlag { get; set; }
+
         [Description("Strip the prerelease portion of the version number.")]
         public bool StripPrereleaseFlag { get; set; }
     }

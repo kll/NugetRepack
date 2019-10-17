@@ -43,26 +43,58 @@ namespace NugetRepack.UnitTests
                 .Returns(new PackageInfo("AwesomePackage", "1.0.0", "beta.2", "build.4"));
 
             this.NuspecUpdaterMock
-                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), "1.0.0+build.4"))
+                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), It.IsAny<string?>(), "1.0.0+build.4"))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", true);
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, true);
 
             this.NuspecUpdaterMock.Verify();
         }
 
         [Fact]
-        public async Task DoesNotStripPrereleaseWhenNotAsked()
+        public async Task DoesNotUpdateVersionWhenStripPrereleaseIsFalse()
         {
             this.ParserMock
                 .Setup(parser => parser.Parse(It.IsAny<string>()))
                 .Returns(new PackageInfo("AwesomePackage", "1.0.0", "beta.2", "build.4"));
 
             this.NuspecUpdaterMock
-                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), "1.0.0-beta.2+build.4"))
+                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), It.IsAny<string?>(), null))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", false);
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false);
+
+            this.NuspecUpdaterMock.Verify();
+        }
+
+        [Fact]
+        public async Task UpdatesPackageIdWhenAsked()
+        {
+            this.ParserMock
+                .Setup(parser => parser.Parse(It.IsAny<string>()))
+                .Returns(new PackageInfo("AwesomePackage", "1.0.0", "beta.2", "build.4"));
+
+            this.NuspecUpdaterMock
+                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), "AnotherAwesomePackage", It.IsAny<string?>()))
+                .Verifiable();
+
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", "AnotherAwesomePackage", false);
+
+            this.NuspecUpdaterMock.Verify();
+        }
+
+        [Fact]
+        public async Task DoesNotUpdatePackageIdWhenNotAsked()
+        {
+            this.ParserMock
+                .Setup(parser => parser.Parse(It.IsAny<string>()))
+                .Returns(new PackageInfo("AwesomePackage", "1.0.0", "beta.2", "build.4"));
+
+            this.NuspecUpdaterMock
+                .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), null, It.IsAny<string?>()))
+                .Verifiable();
+
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false);
 
             this.NuspecUpdaterMock.Verify();
         }

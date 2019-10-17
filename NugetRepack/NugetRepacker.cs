@@ -34,9 +34,9 @@ namespace NugetRepack
 
         private IZipper Zipper { get; }
 
-        public async Task RepackPackage(string package, bool stripPrerelease)
+        public async Task RepackPackage(string package, string? newPackageId, bool stripPrerelease)
         {
-            Logger.Verbose("Repacking package: {Package}", package);
+            Logger.Information("Repacking package: {Package}", package);
 
             var packageInfo = this.Parser.Parse(package);
             var version = stripPrerelease ? packageInfo.FullVersionWithoutPrerelease : packageInfo.FullVersion;
@@ -44,15 +44,25 @@ namespace NugetRepack
             var tempFolder = GenerateTemporaryPath();
             await this.Zipper.Unzip(package, tempFolder);
 
-            await this.NuspecUpdater.UpdateNuspec(tempFolder, version);
+            await this.NuspecUpdater.UpdateNuspec(
+                tempFolder,
+                newPackageId,
+                stripPrerelease ? packageInfo.FullVersionWithoutPrerelease : null);
+
+            if (!string.IsNullOrWhiteSpace(newPackageId))
+            {
+                // New package ID means we also nead to update the nuspec filename.
+                this.RenameNuspecFile(packageInfo, tempFolder, newPackageId);
+            }
 
             var tempFile = GenerateTemporaryPath();
             await this.Zipper.Zip(tempFolder, tempFile);
 
             this.Cleanup(package, tempFolder);
 
-            var newPackage = GetNewPackageName(package, packageInfo.Name, version);
+            var newPackage = GetNewPackageName(package, newPackageId ?? packageInfo.Name, version);
             this.FileSystem.MoveFile(tempFile, newPackage);
+            Logger.Information("New package is at: {Package}", newPackage);
         }
 
         private static string GenerateTemporaryPath()
@@ -76,11 +86,21 @@ namespace NugetRepack
 
         private void Cleanup(string oldPackage, string tempFolder)
         {
-            Logger.Verbose("Deleting old package: {File}", oldPackage);
+            Logger.Information("Cleaning up temporary files.");
+
+            Logger.Debug("Deleting old package: {File}", oldPackage);
             this.FileSystem.DeleteFile(oldPackage);
 
-            Logger.Verbose("Deleting temp folder: {Folder}", tempFolder);
+            Logger.Debug("Deleting temp folder: {Folder}", tempFolder);
             this.FileSystem.DeleteDirectory(tempFolder);
+        }
+
+        private void RenameNuspecFile(PackageInfo packageInfo, string tempFolder, string newPackageId)
+        {
+            var originalNuspec = Path.Combine(tempFolder, $"{packageInfo.Name}.nuspec");
+            var newNuspec = Path.Combine(tempFolder, $"{newPackageId}.nuspec");
+            Logger.Debug("Renaming {OriginalNuspec} file to {NewNuspec}", originalNuspec, newNuspec);
+            this.FileSystem.MoveFile(originalNuspec, newNuspec);
         }
     }
 }

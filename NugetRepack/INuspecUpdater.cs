@@ -7,6 +7,6 @@ namespace NugetRepack
 
     public interface INuspecUpdater
     {
-        Task UpdateNuspec(string path, string version);
+        Task UpdateNuspec(string path, string? packageId, string? version);
     }
 }

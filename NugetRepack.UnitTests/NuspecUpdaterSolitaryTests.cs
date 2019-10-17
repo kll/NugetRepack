@@ -27,7 +27,15 @@ namespace NugetRepack.UnitTests
   </metadata>
 </package>";
 
-        private static string UpdatedNuspec => @"<?xml version='1.0' encoding='utf-8'?>
+        private static string UpdatedId => @"<?xml version='1.0' encoding='utf-8'?>
+<package xmlns='http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'>
+  <metadata>
+    <id>SomeOtherId</id>
+    <version>0.1.5-rc.11</version>
+  </metadata>
+</package>";
+
+        private static string UpdatedVersion => @"<?xml version='1.0' encoding='utf-8'?>
 <package xmlns='http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd'>
   <metadata>
     <id>NugetRepack.Tool</id>
@@ -40,14 +48,25 @@ namespace NugetRepack.UnitTests
         private NuspecUpdater Target { get; }
 
         [Fact]
-        public async Task CanUpdateNuspec()
+        public async Task CanUpdatePackageId()
         {
             this.FileSystem.AddFile("file.nuspec", OriginalNuspec);
 
-            await this.Target.UpdateNuspec("file.nuspec", "0.1.5");
+            await this.Target.UpdateNuspec("file.nuspec", "SomeOtherId", null);
 
             var result = await this.FileSystem.ReadAllText("file.nuspec");
-            result.Should().Be(UpdatedNuspec);
+            result.Should().Be(UpdatedId);
+        }
+
+        [Fact]
+        public async Task CanUpdateVersion()
+        {
+            this.FileSystem.AddFile("file.nuspec", OriginalNuspec);
+
+            await this.Target.UpdateNuspec("file.nuspec", null, "0.1.5");
+
+            var result = await this.FileSystem.ReadAllText("file.nuspec");
+            result.Should().Be(UpdatedVersion);
         }
     }
 }

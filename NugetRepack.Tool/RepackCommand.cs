@@ -40,7 +40,10 @@ namespace NugetRepack.Tool
 
             try
             {
-                await this.NugetRepacker.RepackPackage(input.PackageFile, input.StripPrereleaseFlag);
+                await this.NugetRepacker.RepackPackage(
+                    input.PackageFile,
+                    input.NewPackageIdFlag,
+                    input.StripPrereleaseFlag);
 
                 return true;
             }
