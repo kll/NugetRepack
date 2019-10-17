@@ -34,7 +34,11 @@ namespace NugetRepack
 
         private IZipper Zipper { get; }
 
-        public async Task RepackPackage(string package, string? newPackageId, bool stripPrerelease)
+        public async Task RepackPackage(
+            string package,
+            string? newPackageId,
+            bool stripPrerelease,
+            string? additionalContentPath)
         {
             Logger.Information("Repacking package: {Package}", package);
 
@@ -53,6 +57,12 @@ namespace NugetRepack
             {
                 // New package ID means we also nead to update the nuspec filename.
                 this.RenameNuspecFile(packageInfo, tempFolder, newPackageId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(additionalContentPath))
+            {
+                Log.Information("Copying additional content into the package.");
+                this.CopyDirectory(additionalContentPath, tempFolder);
             }
 
             var tempFile = GenerateTemporaryPath();
@@ -93,6 +103,40 @@ namespace NugetRepack
 
             Logger.Debug("Deleting temp folder: {Folder}", tempFolder);
             this.FileSystem.DeleteDirectory(tempFolder);
+        }
+
+        private void CopyDirectory(string sourcePath, string targetPath)
+        {
+            var source = this.FileSystem.GetDirectory(sourcePath);
+            var target = this.FileSystem.GetDirectory(targetPath);
+
+            Log.Debug("Copying {SourcePath} to {TargetPath}.", sourcePath, targetPath);
+
+            if (!source.Exists)
+            {
+                Logger.Error("Directory {Directory} is invalid, no files copied.", sourcePath);
+
+                return;
+            }
+
+            if (!target.Exists)
+            {
+                target.Create();
+            }
+
+            // Copy all the files.
+            foreach (var file in source.GetFiles())
+            {
+                var targetFilePath = Path.Combine(targetPath, file.Name);
+                file.CopyTo(targetFilePath, true);
+            }
+
+            // And then recursively copy subdirectories.
+            foreach (var directory in source.GetDirectories())
+            {
+                var targetSubdirectory = Path.Combine(targetPath, directory.Name);
+                this.CopyDirectory(directory.FullName, targetSubdirectory);
+            }
         }
 
         private void RenameNuspecFile(PackageInfo packageInfo, string tempFolder, string newPackageId)

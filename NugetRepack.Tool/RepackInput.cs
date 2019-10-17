@@ -15,6 +15,9 @@ namespace NugetRepack.Tool
         [Description("The logging level to use. Default: Information")]
         public LogEventLevel LogLevelFlag { get; set; } = LogEventLevel.Information;
 
+        [Description("Add additional content from a directory to the NuGet package.")]
+        public string? AddContentFlag { get; set; }
+
         [Description("Change the NuGet package ID to a different value.")]
         public string? NewPackageIdFlag { get; set; }
 

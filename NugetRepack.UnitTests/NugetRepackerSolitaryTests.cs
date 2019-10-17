@@ -46,7 +46,7 @@ namespace NugetRepack.UnitTests
                 .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), It.IsAny<string?>(), "1.0.0+build.4"))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, true);
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, true, null);
 
             this.NuspecUpdaterMock.Verify();
         }
@@ -62,7 +62,7 @@ namespace NugetRepack.UnitTests
                 .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), It.IsAny<string?>(), null))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false);
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false, null);
 
             this.NuspecUpdaterMock.Verify();
         }
@@ -78,7 +78,11 @@ namespace NugetRepack.UnitTests
                 .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), "AnotherAwesomePackage", It.IsAny<string?>()))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", "AnotherAwesomePackage", false);
+            await this.Target.RepackPackage(
+                "/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg",
+                "AnotherAwesomePackage",
+                false,
+                null);
 
             this.NuspecUpdaterMock.Verify();
         }
@@ -94,7 +98,7 @@ namespace NugetRepack.UnitTests
                 .Setup(updater => updater.UpdateNuspec(It.IsAny<string>(), null, It.IsAny<string?>()))
                 .Verifiable();
 
-            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false);
+            await this.Target.RepackPackage("/tmp/AwesomePackage.1.0.0-beta.2+build.4.nupkg", null, false, null);
 
             this.NuspecUpdaterMock.Verify();
         }

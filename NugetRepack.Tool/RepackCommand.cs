@@ -43,7 +43,8 @@ namespace NugetRepack.Tool
                 await this.NugetRepacker.RepackPackage(
                     input.PackageFile,
                     input.NewPackageIdFlag,
-                    input.StripPrereleaseFlag);
+                    input.StripPrereleaseFlag,
+                    input.AddContentFlag);
 
                 return true;
             }
